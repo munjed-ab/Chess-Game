@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chess Game</title>
+
+  <style>
+    body {
+      background-image: url("{{ url_for('static', filename='images/backG2.jpg') }}");
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    /* Style for chessboard */
+    .chessboard {
+      display: flex;
+      margin: 0 auto;
+      text-align: center;
+      max-width: 90vw;
+      max-height: 90vh;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .square {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box;
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .even {
+      background-color: #808080;
+    }
+
+    .odd {
+      background-color: #ffffff;
+    }
+
+
+    /* Style for pieces */
+    .piece {
+      width: 100%;
+      height: 100%;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+    /* Style for flip button */
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .flip-button {
+      padding: 10px 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #ffffff;
+      background-color: #5a5a5a;
+      border: none;
+      cursor: pointer;
+      outline: none;
+      border-radius: 5px;
+      margin-left: 10px;
+      margin-right: 10px;
+
+    }
+    .reset-button {
+      padding: 10px 20px;
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: bold;
+      background-color: #5a5a5a;
+      border: none;
+      cursor: pointer;
+      outline: none;
+      border-radius: 5px;
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+    /* Style for colors */
+    .white-bg {
+      background-color: white;
+   }
+
+    .black-bg {
+      background-color: black;
+    }
+
+    /* Media Queries */
+    @media (max-width: 600px) {
+      /* Adjust chessboard and square dimensions for small screens */
+      .game {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .chessboard {
+        max-width: 90vw;
+        max-height: 90vw;
+      }
+      .square {
+        width: 12.5vw;
+        height: 12.5vw;
+      }
+      .piece {
+        background-size: 80%;
+      }
+    }
+
+    @media (min-width: 601px) and (max-width: 900px) {
+      /* Adjust chessboard and square dimensions for medium screens */
+      .chessboard {
+        max-width: 80vw;
+        max-height: 80vw;
+      }
+      .square {
+        width: 10vw;
+        height: 10vw;
+      }
+      .piece {
+        background-size: 70%;
+      }
+    }
+
+    @media (min-width: 901px) {
+      /* Adjust chessboard and square dimensions for large screens */
+      .chessboard {
+        max-width: 600px;
+        max-height: 600px;
+      }
+      .square {
+        width: 70px;
+        height: 70px;
+      }
+      .piece {
+        background-size: contain;
+      }
+    }
+    #moveSound {
+      display: none;
+    }
+    #boardStart {
+      display: none;
+    }
+  </style>
+
+</head>
+<body>
+  <audio id="moveSound" src="{{ url_for('static', filename='sound/move-self.mp3') }}" ></audio>
+  <audio id="boardStart" src="{{ url_for('static', filename='sound/board-start.mp3') }}" ></audio>
+  <div class="game">
+    <div class="chessboard">
+      <!-- Rows of squares -->
+      <div class="row">
+        <div class="square even" id="a8" data-row="8" data-col="1"></div>
+        <div class="square odd" id="a7" data-row="7" data-col="1"></div>
+        <div class="square even" id="a6" data-row="6" data-col="1"></div>
+        <div class="square odd" id="a5" data-row="5" data-col="1"></div>
+        <div class="square even" id="a4" data-row="4" data-col="1"></div>
+        <div class="square odd" id="a3" data-row="3" data-col="1"></div>
+        <div class="square even" id="a2" data-row="2" data-col="1"></div>
+        <div class="square odd" id="a1" data-row="1" data-col="1"></div>
+      </div>
+      <div class="row">
+        <div class="square odd" id="b8"  data-row="8" data-col="2"></div>
+        <div class="square even" id="b7" data-row="7" data-col="2" ></div>
+        <div class="square odd" id="b6"  data-row="6" data-col="2"></div>
+        <div class="square even" id="b5" data-row="5" data-col="2" ></div>
+        <div class="square odd" id="b4"  data-row="4" data-col="2"></div>
+        <div class="square even" id="b3" data-row="3" data-col="2" ></div>
+        <div class="square odd" id="b2"  data-row="2" data-col="2"></div>
+        <div class="square even" id="b1" data-row="1" data-col="2" ></div>
+      </div>
+      <div class="row">
+        <div class="square even" id="c8" data-row="8" data-col="3" ></div>
+        <div class="square odd" id="c7" data-row="7"  data-col="3" ></div>
+        <div class="square even" id="c6" data-row="6" data-col="3" ></div>
+        <div class="square odd" id="c5" data-row="5"  data-col="3" ></div>
+        <div class="square even" id="c4" data-row="4" data-col="3" ></div>
+        <div class="square odd" id="c3" data-row="3"  data-col="3" ></div>
+        <div class="square even" id="c2" data-row="2" data-col="3" ></div>
+        <div class="square odd" id="c1" data-row="1"  data-col="3" ></div>
+      </div>
+      <div class="row">
+        <div class="square odd" id="d8"  data-row="8" data-col="4" ></div>
+        <div class="square even" id="d7" data-row="7"  data-col="4"  ></div>
+        <div class="square odd" id="d6"  data-row="6" data-col="4" ></div>
+        <div class="square even" id="d5" data-row="5"  data-col="4" ></div>
+        <div class="square odd" id="d4"  data-row="4" data-col="4" ></div>
+        <div class="square even" id="d3" data-row="3"  data-col="4" ></div>
+        <div class="square odd" id="d2"  data-row="2" data-col="4" ></div>
+        <div class="square even" id="d1" data-row="1"  data-col="4" ></div>
+      </div>
+      <div class="row">
+        <div class="square even" id="e8"  data-row="8" data-col="5" ></div>
+        <div class="square odd" id="e7"  data-row="7"  data-col="5" ></div>
+        <div class="square even" id="e6"  data-row="6" data-col="5" ></div>
+        <div class="square odd" id="e5"  data-row="5"  data-col="5" ></div>
+        <div class="square even" id="e4"  data-row="4" data-col="5" ></div>
+        <div class="square odd" id="e3"  data-row="3"  data-col="5" ></div>
+        <div class="square even" id="e2"  data-row="2" data-col="5" ></div>
+        <div class="square odd" id="e1"  data-row="1"  data-col="5" ></div>
+      </div>
+      <div class="row">
+        <div class="square odd" id="f8"   data-row="8" data-col="6" ></div>
+        <div class="square even" id="f7" data-row="7"  data-col="6" ></div>
+        <div class="square odd" id="f6"   data-row="6" data-col="6" ></div>
+        <div class="square even" id="f5" data-row="5"  data-col="6" ></div>
+        <div class="square odd" id="f4"   data-row="4" data-col="6" ></div>
+        <div class="square even" id="f3" data-row="3"  data-col="6" ></div>
+        <div class="square odd" id="f2"   data-row="2" data-col="6" ></div>
+        <div class="square even" id="f1" data-row="1"  data-col="6" ></div>
+      </div>
+      <div class="row">
+        <div class="square even" id="g8"  data-row="8" data-col="7" ></div>
+        <div class="square odd" id="g7"  data-row="7"  data-col="7" ></div>
+        <div class="square even" id="g6"  data-row="6" data-col="7" ></div>
+        <div class="square odd" id="g5"  data-row="5"  data-col="7" ></div>
+        <div class="square even" id="g4"  data-row="4" data-col="7"  ></div>
+        <div class="square odd" id="g3"  data-row="3"  data-col="7" ></div>
+        <div class="square even" id="g2"  data-row="2" data-col="7" ></div>
+        <div class="square odd" id="g1"  data-row="1"  data-col="7" ></div>
+      </div>
+      <div class="row">
+        <div class="square odd" id="h8"   data-row="8" data-col="8" ></div>
+        <div class="square even" id="h7" data-row="7"  data-col="8" ></div>
+        <div class="square odd" id="h6"   data-row="6" data-col="8" ></div>
+        <div class="square even" id="h5" data-row="5"  data-col="8" ></div>
+        <div class="square odd" id="h4"   data-row="4" data-col="8" ></div>
+        <div class="square even" id="h3" data-row="3"  data-col="8" ></div>
+        <div class="square odd" id="h2"   data-row="2" data-col="8" ></div>
+        <div class="square even" id="h1" data-row="1"  data-col="8" ></div>
+      </div>
+    </div>
+      <div class="container">
+        <button name="flip" class="flip-button" onclick="flipChessboard();">Flip</button>
+        <button name="reset" class="reset-button" onclick="resetGame();">Reset</button>
+      </div>
+  </div>
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
